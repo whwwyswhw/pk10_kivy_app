@@ -33,23 +33,28 @@ jobs:
           python3 -m pip install --upgrade pip setuptools wheel
           python3 -m pip install buildozer cython
 
-      - name: Setup Android SDK & NDK
+      - name: Accept Android SDK licenses
         run: |
-          mkdir -p ~/.buildozer/android/platform/cmdline-tools
-          cd ~/.buildozer/android/platform/cmdline-tools
+          mkdir -p ~/.buildozer/android/platform/android-sdk
+          cd ~/.buildozer/android/platform
           wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
           unzip -q commandlinetools-linux-9477386_latest.zip
-          mv cmdline-tools latest
-          yes | ~/.buildozer/android/platform/cmdline-tools/latest/bin/sdkmanager --sdk_root=$HOME/.buildozer/android/platform --licenses
-          ~/.buildozer/android/platform/cmdline-tools/latest/bin/sdkmanager --sdk_root=$HOME/.buildozer/android/platform "platform-tools" "platforms;android-33" "build-tools;33.0.0"
+          mkdir -p android-sdk/cmdline-tools
+          mv cmdline-tools android-sdk/cmdline-tools/latest
+          yes | android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=android-sdk --licenses
+          android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=android-sdk \
+            "platform-tools" "platforms;android-33" "build-tools;33.0.0"
+
+      - name: Setup NDK
+        run: |
           cd ~/.buildozer/android/platform
           wget -q https://dl.google.com/android/repository/android-ndk-r23b-linux.zip
           unzip -q android-ndk-r23b-linux.zip
 
       - name: Set environment
         run: |
-          echo "ANDROID_HOME=$HOME/.buildozer/android/platform" >> $GITHUB_ENV
-          echo "ANDROID_SDK_ROOT=$HOME/.buildozer/android/platform" >> $GITHUB_ENV
+          echo "ANDROID_HOME=$HOME/.buildozer/android/platform/android-sdk" >> $GITHUB_ENV
+          echo "ANDROID_SDK_ROOT=$HOME/.buildozer/android/platform/android-sdk" >> $GITHUB_ENV
           echo "ANDROID_NDK_HOME=$HOME/.buildozer/android/platform/android-ndk-r23b" >> $GITHUB_ENV
           echo "JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64" >> $GITHUB_ENV
 
