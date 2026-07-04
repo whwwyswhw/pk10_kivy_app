@@ -41,9 +41,12 @@ jobs:
           unzip -q commandlinetools-linux-9477386_latest.zip
           mkdir -p android-sdk/cmdline-tools
           mv cmdline-tools android-sdk/cmdline-tools/latest
+          mkdir -p android-sdk/tools/bin
+          ln -s ../../cmdline-tools/latest/bin/sdkmanager android-sdk/tools/bin/sdkmanager
           yes | android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=android-sdk --licenses
           android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=android-sdk \
             "platform-tools" "platforms;android-33" "build-tools;33.0.0"
+
 
       - name: Setup NDK
         run: |
