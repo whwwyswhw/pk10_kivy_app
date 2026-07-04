@@ -22,10 +22,10 @@ source.include_exts = py,png,jpg,kv,atlas,json,txt
 main_filename = main.py
 
 # Requirements - Kivy + 依赖
-requirements = python3,kivy==2.3.1,requests,urllib3,charset-normalizer,certifi,idna,six
+requirements = python3==3.10.11,hostpython3==3.10.11,kivy==2.3.1,requests,urllib3,charset-normalizer,certifi,idna
 
 # Kivy 版本
-osx.kivy_version = 2.1.0
+osx.kivy_version = 2.3.1
 
 # Android 权限
 android.permissions = INTERNET,ACCESS_NETWORK_STATE,ACCESS_WIFI_STATE
