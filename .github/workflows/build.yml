@@ -23,7 +23,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y \
             build-essential ccache git zlib1g-dev \
-            libncurses5-dev libncursesw5-dev libtinfo5 \
+             libncursesw5-dev \
             cmake libffi-dev libssl-dev autoconf libtool \
             pkg-config zip unzip openjdk-17-jdk \
             python3-pip python3-dev python3-venv \
