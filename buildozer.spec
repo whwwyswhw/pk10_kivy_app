@@ -56,6 +56,9 @@ fullscreen = 0
 # Log 级别 (debug/info/warning/error/critical)
 log_level = 2
 
+# 允许 HTTP 明文请求（Android 9+）
+android.allow_clear_text = true
+
 # 允许应用后台运行
 android.allow_backup = True
 

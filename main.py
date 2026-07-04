@@ -208,8 +208,9 @@ class APIClient:
         if not game_info:
             return None
         try:
+            session = self._get_session()
             params = {"lotCode": game_info["lotCode"]}
-            r = requests.get(CURRENT_DRAW_API, params=params, timeout=10)
+            r = session.get(CURRENT_DRAW_API, params=params, timeout=10)
             if r.status_code == 200:
                 data = r.json()
                 if isinstance(data, dict):
@@ -937,11 +938,10 @@ class MainScreen(Screen):
         lottery_code = game.get("lottery_url_code", "")
         lot_code = game.get("lotCode", "")
 
-        # 获取最新期号
-        draw = app.api.get_current_draw(self.current_game)
-        issue = draw.get("next_issue", "") if draw else ""
-
         def submit_thread():
+            # 获取最新期号（在后台线程中请求）
+            draw = app.api.get_current_draw(self.current_game)
+            issue = draw.get("next_issue", "") if draw else ""
             ok_count = 0
             fail_count = 0
             for pos in positions:
@@ -1027,11 +1027,11 @@ class MainScreen(Screen):
         lot_code = game.get("lotCode", "")
         amt = self.chase_sequence[self.chase_current_step]
 
-        draw = app.api.get_current_draw(self.current_game)
-        issue = draw.get("next_issue", str(int(time.time()))) if draw else str(int(time.time()))
-        self.chase_bet_issue = issue
-
         def submit():
+            draw = app.api.get_current_draw(self.current_game)
+            issue = draw.get("next_issue", str(int(time.time()))) if draw else str(int(time.time()))
+            self.chase_bet_issue = issue
+
             ok_count = 0
             for num in self.chase_target_nums:
                 ok, msg = app.api.submit_bet(lottery_code, issue, str(self.chase_position),
@@ -1053,48 +1053,52 @@ class MainScreen(Screen):
             return
 
         app = App.get_running_app()
-        draw = app.api.get_current_draw(self.current_game)
-        if not draw:
-            return
 
-        numbers = draw.get('numbers', [])
-        current_issue = draw.get('issue', '')
-
-        if not numbers or current_issue == self.chase_bet_issue:
-            return
-
-        # 获取指定名次的结果号码
-        try:
-            idx = self.chase_position - 1
-            drawn = int(numbers[idx]) if idx < len(numbers) else 0
-        except:
-            return
-
-        hit = drawn in self.chase_target_nums
-        amt = self.chase_sequence[self.chase_current_step]
-
-        self.chase_history.append({
-            'issue': current_issue, 'drawn': drawn, 'hit': hit,
-            'amount': amt, 'step': self.chase_current_step
-        })
-        self._update_chase_history()
-
-        if hit:
-            self.chase_current_step = 0
-            app.log(f"追号命中! {current_issue}开出{drawn} ✓ 重置→¥{self.chase_sequence[0]}")
-        else:
-            self.chase_current_step += 1
-            if self.chase_current_step >= len(self.chase_sequence):
-                app.log(f"追号序列用完({current_issue}开{drawn})，停止")
-                self._stop_chase()
+        def check():
+            draw = app.api.get_current_draw(self.current_game)
+            if not draw:
                 return
-            app.log(f"追号未中({current_issue}开{drawn}) → 第{self.chase_current_step+1}步 ¥{self.chase_sequence[self.chase_current_step]}")
 
-        self._update_chase_status()
-        self.chase_bet_issue = None
+            numbers = draw.get('numbers', [])
+            current_issue = draw.get('issue', '')
 
-        if self.chase_active:
-            Clock.schedule_once(lambda dt: self._execute_chase_bet(), 3)
+            if not numbers or current_issue == self.chase_bet_issue:
+                return
+
+            try:
+                idx = self.chase_position - 1
+                drawn = int(numbers[idx]) if idx < len(numbers) else 0
+            except:
+                return
+
+            hit = drawn in self.chase_target_nums
+            amt = self.chase_sequence[self.chase_current_step]
+
+            self.chase_history.append({
+                'issue': current_issue, 'drawn': drawn, 'hit': hit,
+                'amount': amt, 'step': self.chase_current_step
+            })
+
+            if hit:
+                self.chase_current_step = 0
+                app.log(f"追号命中! {current_issue}开出{drawn} ✓ 重置→¥{self.chase_sequence[0]}")
+            else:
+                self.chase_current_step += 1
+                if self.chase_current_step >= len(self.chase_sequence):
+                    app.log(f"追号序列用完({current_issue}开{drawn})，停止")
+                    Clock.schedule_once(lambda dt: self._stop_chase(), 0)
+                    return
+                app.log(f"追号未中({current_issue}开{drawn}) → 第{self.chase_current_step+1}步 ¥{self.chase_sequence[self.chase_current_step]}")
+
+            self.chase_bet_issue = None
+
+            Clock.schedule_once(lambda dt: self._update_chase_status(), 0)
+            Clock.schedule_once(lambda dt: self._update_chase_history(), 0)
+
+            if self.chase_active:
+                Clock.schedule_once(lambda dt: self._execute_chase_bet(), 3)
+
+        threading.Thread(target=check, daemon=True).start()
 
     def _update_chase_status(self):
         if not self.chase_active:
