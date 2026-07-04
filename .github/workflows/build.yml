@@ -33,13 +33,12 @@ jobs:
           python3 -m pip install --upgrade pip setuptools wheel
           python3 -m pip install buildozer cython
 
-      - name: Accept Android SDK licenses
+      - name: Setup Android SDK
         run: |
-          mkdir -p ~/.buildozer/android/platform/android-sdk
+          mkdir -p ~/.buildozer/android/platform/android-sdk/cmdline-tools
           cd ~/.buildozer/android/platform
           wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
           unzip -q commandlinetools-linux-9477386_latest.zip
-          mkdir -p android-sdk/cmdline-tools
           mv cmdline-tools android-sdk/cmdline-tools/latest
           mkdir -p android-sdk/tools/bin
           ln -s ../../cmdline-tools/latest/bin/sdkmanager android-sdk/tools/bin/sdkmanager
@@ -47,12 +46,11 @@ jobs:
           android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=android-sdk \
             "platform-tools" "platforms;android-33" "build-tools;33.0.0"
 
-
-      - name: Setup NDK
+      - name: Setup NDK r25b
         run: |
           cd ~/.buildozer/android/platform
-          wget -q https://dl.google.com/android/repository/android-ndk-r23b-linux.zip
-          unzip -q android-ndk-r23b-linux.zip
+          wget -q https://dl.google.com/android/repository/android-ndk-r25b-linux.zip
+          unzip -q android-ndk-r25b-linux.zip
 
       - name: Set environment
         run: |
@@ -60,7 +58,7 @@ jobs:
           unset ANDROID_NDK_ROOT
           echo "ANDROID_HOME=$HOME/.buildozer/android/platform/android-sdk" >> $GITHUB_ENV
           echo "ANDROID_SDK_ROOT=$HOME/.buildozer/android/platform/android-sdk" >> $GITHUB_ENV
-          echo "ANDROID_NDK_HOME=$HOME/.buildozer/android/platform/android-ndk-r23b" >> $GITHUB_ENV
+          echo "ANDROID_NDK_HOME=$HOME/.buildozer/android/platform/android-ndk-r25b" >> $GITHUB_ENV
           echo "JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64" >> $GITHUB_ENV
 
       - name: Cache Buildozer
@@ -70,8 +68,8 @@ jobs:
             ~/.buildozer
             ~/.gradle
             .buildozer
-          key: buildozer-${{ runner.os }}-${{ hashFiles('buildozer.spec') }}
-          restore-keys: buildozer-${{ runner.os }}-
+          key: buildozer-${{ runner.os }}-v2-${{ hashFiles('buildozer.spec') }}
+          restore-keys: buildozer-${{ runner.os }}-v2-
 
       - name: Build APK
         run: buildozer -v android debug
@@ -83,10 +81,3 @@ jobs:
           path: bin/*.apk
           if-no-files-found: error
           retention-days: 30
-
-      - name: Release
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v2
-        with:
-          files: bin/*.apk
-          generate_release_notes: true
