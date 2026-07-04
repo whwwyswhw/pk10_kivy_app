@@ -22,7 +22,7 @@ source.include_exts = py,png,jpg,kv,atlas,json,txt
 main_filename = main.py
 
 # Requirements - Kivy + 依赖
-requirements = python3,kivy==2.1.0,requests,urllib3,charset-normalizer,certifi,idna
+requirements = python3,kivy==2.3.1,requests,urllib3,charset-normalizer,certifi,idna,six
 
 # Kivy 版本
 osx.kivy_version = 2.1.0
