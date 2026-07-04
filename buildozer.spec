@@ -35,7 +35,7 @@ android.minapi = 21
 
 # Android 目标 API 级别
 android.api = 33
-android.ndk = 23b
+android.ndk = 25b
 
 # 架构支持 (armeabi-v7a 兼容最广，arm64-v8a 性能好)
 android.archs = armeabi-v7a,arm64-v8a
