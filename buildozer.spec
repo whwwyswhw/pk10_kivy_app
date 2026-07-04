@@ -37,11 +37,8 @@ android.minapi = 21
 android.api = 33
 android.ndk = 23b
 
-# Android SDK
-android.sdk = 31
-
 # 架构支持 (armeabi-v7a 兼容最广，arm64-v8a 性能好)
-android.arch = armeabi-v7a,arm64-v8a
+android.archs = armeabi-v7a,arm64-v8a
 
 # 编译模式 debug/release
 android.release_artifact = aab
