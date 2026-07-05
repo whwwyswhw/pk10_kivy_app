@@ -68,8 +68,9 @@ jobs:
             ~/.buildozer
             ~/.gradle
             .buildozer
-          key: buildozer-${{ runner.os }}-v2-${{ hashFiles('buildozer.spec') }}
-          restore-keys: buildozer-${{ runner.os }}-v2-
+          key: buildozer-${{ runner.os }}-v3-${{ hashFiles('buildozer.spec') }}
+          restore-keys: buildozer-${{ runner.os }}-v3-
+
       - name: Patch p4a to prevent pip upgrade
         run: |
           mkdir -p ~/.pip
@@ -77,14 +78,12 @@ jobs:
           [global]
           disable-pip-version-check = true
           EOF
-          # Force system pip to 24.x, prevent 26
           python3 -m pip install pip==24.3.1
-      
-            - name: Build APK
+
+      - name: Build APK
         env:
           PIP_NO_PIP_VERSION_CHECK: "1"
         run: buildozer -v android debug
-
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
