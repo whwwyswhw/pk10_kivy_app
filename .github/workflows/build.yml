@@ -18,9 +18,11 @@ jobs:
           docker run --rm \
             -v ${{ github.workspace }}:/workspace \
             -w /workspace \
-            --user 0:0 \
             ghcr.io/kivy/buildozer:latest \
-            bash -c "buildozer android debug"
+            bash -c "
+              sed -i 's/os.geteuid() == 0/False/' /home/user/.venv/lib/python3.14/site-packages/buildozer/__init__.py
+              buildozer -v android debug
+            "
 
       - name: Upload APK
         if: always()
