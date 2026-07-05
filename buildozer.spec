@@ -22,7 +22,7 @@ source.include_exts = py,png,jpg,kv,atlas,json,txt
 main_filename = main.py
 
 # Requirements - Kivy + 依赖
-requirements = python3==3.10.11,hostpython3==3.10.11,kivy==2.3.1,requests,urllib3,charset-normalizer,certifi,idna
+requirements = python3==3.11.5,hostpython3==3.11.5,kivy==2.3.1,requests,urllib3,charset-normalizer,certifi,idna
 
 # Kivy 版本
 osx.kivy_version = 2.3.1
@@ -35,7 +35,7 @@ android.minapi = 21
 
 # Android 目标 API 级别
 android.api = 33
-android.ndk = 25b
+android.ndk = 21d
 
 # 架构支持 (armeabi-v7a 兼容最广，arm64-v8a 性能好)
 android.archs = armeabi-v7a,arm64-v8a
