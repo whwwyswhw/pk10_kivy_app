@@ -34,8 +34,8 @@ android.permissions = INTERNET,ACCESS_NETWORK_STATE,ACCESS_WIFI_STATE
 android.minapi = 21
 
 # Android 目标 API 级别
-android.api = 33
-android.ndk = 25b
+android.api = 29
+android.ndk = 19c
 
 # 架构支持 (armeabi-v7a 兼容最广，arm64-v8a 性能好)
 android.archs = armeabi-v7a,arm64-v8a
