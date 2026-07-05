@@ -6,25 +6,27 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-android:
-    runs-on: ubuntu-latest
+  build:
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Build with Buildozer (Docker)
-        uses: ArtemSBulgakov/buildozer-action@v1
-        id: buildozer
-        with:
-          workdir: .
-          buildozer_version: stable
+      - name: Build APK (in Buildozer Docker)
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/workspace \
+            -w /workspace \
+            --user 0:0 \
+            ghcr.io/kivy/buildozer:latest \
+            bash -c "buildozer android debug"
 
       - name: Upload APK
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: PK10-APK
-          path: ${{ steps.buildozer.outputs.filename }}
+          path: bin/*.apk
           if-no-files-found: warn
           retention-days: 30
