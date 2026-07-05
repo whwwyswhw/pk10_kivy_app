@@ -24,9 +24,6 @@ main_filename = main.py
 # Requirements - Kivy + 依赖
 requirements = python3==3.10.11,hostpython3==3.10.11,kivy==2.3.1,requests,urllib3,charset-normalizer,certifi,idna
 
-# 使用 p4a develop 分支（修复 pip 26 兼容性）
-p4a.branch = develop
-
 # Kivy 版本
 osx.kivy_version = 2.3.1
 
