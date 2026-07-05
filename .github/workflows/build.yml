@@ -40,41 +40,20 @@ jobs:
           yes | android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=android-sdk --licenses
           android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=android-sdk "platform-tools" "platforms;android-33" "build-tools;33.0.0"
 
-      - name: Setup NDK r25b
+      - name: Setup NDK r21d
         run: |
           cd ~/.buildozer/android/platform
-          wget -q https://dl.google.com/android/repository/android-ndk-r25b-linux.zip
-          unzip -q android-ndk-r25b-linux.zip
+          wget -q https://dl.google.com/android/repository/android-ndk-r21d-linux-x86_64.zip
+          unzip -q android-ndk-r21d-linux-x86_64.zip
 
       - name: Set environment
         run: |
           echo "ANDROID_HOME=$HOME/.buildozer/android/platform/android-sdk" >> $GITHUB_ENV
           echo "ANDROID_SDK_ROOT=$HOME/.buildozer/android/platform/android-sdk" >> $GITHUB_ENV
-          echo "ANDROID_NDK_HOME=$HOME/.buildozer/android/platform/android-ndk-r25b" >> $GITHUB_ENV
+          echo "ANDROID_NDK_HOME=$HOME/.buildozer/android/platform/android-ndk-r21d" >> $GITHUB_ENV
           echo "JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64" >> $GITHUB_ENV
           echo "PIP_NO_PIP_VERSION_CHECK=1" >> $GITHUB_ENV
           echo "PIP_DISABLE_PIP_VERSION_CHECK=1" >> $GITHUB_ENV
-
-      - name: Clone + patch p4a (fix pip upgrade bug)
-        run: |
-          mkdir -p .buildozer/android/platform
-          cd .buildozer/android/platform
-          rm -rf python-for-android
-          git clone --depth=1 https://github.com/kivy/python-for-android.git
-          cd python-for-android
-          echo "Patching p4a build.py..."
-          find pythonforandroid/ -name "*.py" -exec sed -i 's/pip install -U pip/pip install pip==24.3.1/g' {} +
-          echo "After patch:"
-          grep -rn "pip install" pythonforandroid/build.py | head -10 || true
-          touch /tmp/p4a_patched
-
-      - name: Add p4a.source_dir to buildozer.spec
-        run: |
-          echo "" >> buildozer.spec
-          echo "# Use local patched p4a" >> buildozer.spec
-          echo "p4a.source_dir = .buildozer/android/platform/python-for-android" >> buildozer.spec
-          echo "p4a.branch = master" >> buildozer.spec
-          tail -6 buildozer.spec
 
       - name: Cache Buildozer
         uses: actions/cache@v4
@@ -83,10 +62,9 @@ jobs:
             ~/.buildozer
             ~/.gradle
             .buildozer
-          key: buildozer-${{ runner.os }}-v8-${{ hashFiles('buildozer.spec') }}
+          key: buildozer-${{ runner.os }}-v9-${{ hashFiles('buildozer.spec') }}
           restore-keys: |
-            buildozer-${{ runner.os }}-v8-
-            buildozer-${{ runner.os }}-v7-
+            buildozer-${{ runner.os }}-v9-
 
       - name: Build APK
         env:
