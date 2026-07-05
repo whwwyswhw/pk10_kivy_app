@@ -25,8 +25,8 @@ jobs:
 
       - name: Install Buildozer (pin pip 24.3.1)
         run: |
-          python3 -m pip install --force-reinstall "pip==24.3.1" setuptools==69.5.1 wheel
-          python3 -m pip install "buildozer==1.5.1" "cython==0.29.37"
+          python3 -m pip install --force-reinstall "pip==24.3.1" "setuptools==69.5.1" "wheel==0.42.0" "packaging==24.2"
+          python3 -m pip install "buildozer==1.5.0" "cython==0.29.37"
 
       - name: Setup Android SDK
         run: |
